@@ -20,7 +20,7 @@ def get_note_duration_time(data):
             # appending the last note, since now the code will move on
             # 20 is added since a MIDI note is 20 higher than the note number
             note_duration_time_pair.append([int(current_note)+20, duration, current_time])
-            duration = 1
+            duration = 1/4
             # Updating note
             current_note = note
             # Updating time
@@ -54,6 +54,7 @@ def convert_to_midi(filename: str):
     channel = 0
     volume = 100
     # Amount of voices
+    print(note_duration_time_pair)
     if data.ndim == 1:
         voices = 1
     elif data.ndim == 2:
