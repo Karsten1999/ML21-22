@@ -54,7 +54,6 @@ def convert_to_midi(filename: str):
     channel = 0
     volume = 100
     # Amount of voices
-    print(note_duration_time_pair)
     if data.ndim == 1:
         voices = 1
     elif data.ndim == 2:
