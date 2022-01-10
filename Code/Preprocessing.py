@@ -65,8 +65,9 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
 
     return X_train, X_test, y_train, y_test
 
+
 if __name__ == "__main__":
-    #Split_rolling_window([[0,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1],[0,1,0,0],[0,0,1,0]],window_size = 2)
+    # Split_rolling_window([[0,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1],[0,1,0,0],[0,0,1,0]],window_size = 2)
 
 
     voice1 = np.loadtxt("F.txt").T[0]
