@@ -39,14 +39,14 @@ def Transform_into_vector(data: np.array, min_value: int = None, max_value: int 
         raise ValueError("Data dimension should be 1, not implemented yet for 2, but you can just manually loop.")
 
 
-def Split_rolling_window(data, vector, test_size: float = None, window_size: int = 16):
+def Split_rolling_window(data, vector, test_size: float = None, window_size: int = 16, train = True):
     """
     Function to split the data into a training and test set
 
     :param data: the data in terms of key note, used to make X
     :param vector: the data in terms of a vector, used to make y
-    :param n_splits: number of splits to make, if more than 1 cross-validation is used to score it
     :param window_size: size of the training windows
+    :param train: whether to make a test and training set or just return the complete X and y
     :return:
     """
 
@@ -60,6 +60,8 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
 
     X = np.array(X)
     y = np.array(y)
+    if not train:
+        return X, y
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 

@@ -11,11 +11,14 @@ def get_note_duration_time(data):
     current_time = 0
     next_time = 0
     current_note = data[0]
-    for note in data:
+    for i, note in enumerate(data):
         # If the next note is the same as the current one we increase the duration by 1
         if note == current_note:
             # Each row is a 1/4th beat, see page 7 https://lss.fnal.gov/archive/other/print-93-0456.pdf
             duration += 1/4
+            # Check if the note is the final note
+            if i + 1 == len(data):
+                note_duration_time_pair.append([int(current_note) + 20, duration, current_time])
         else:
             # appending the last note, since now the code will move on
             # 20 is added since a MIDI note is 20 higher than the note number
@@ -31,7 +34,7 @@ def get_note_duration_time(data):
 
 
 
-def convert_to_midi(filename: str):
+def convert_to_midi(filename: str, outputname: str = "output.mid"):
     """"
     :param filename : name of the file to be converted to midi, has to be a txt containing one or more columns
     """
@@ -75,7 +78,7 @@ def convert_to_midi(filename: str):
                 if note > 20:
                     MyMIDI.addNote(track, channel, int(note), time, duration, volume)
     if MyMIDI:
-        with open("output.mid", "wb") as out:
+        with open(outputname, "wb") as out:
             MyMIDI.writeFile(out)
 
 
