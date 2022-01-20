@@ -25,15 +25,20 @@ def Transform_into_vector(data: np.array, min_value: int = None, max_value: int 
                 raise ValueError("Max_value and min_value should at least be the size of the largest note and "
                                  "respectively at most the smallest note")
         if not min_value:
-            min_value = int(min(data))
+            min_value = int(min(data[data>0]))
         if not max_value:
             max_value = int(max(data))
 
         # Create zero matrix which has columns equal to the note vector and is as long as the data
-        matrix = np.zeros((data.size, max_value - min_value + 1))
+        matrix = np.zeros((data.size, max_value - min_value + 2))
         # Finding the positions in each note vector
-        positions = data - min_value
-        matrix[np.arange(0,data.size),positions]=1
+        positions = data - min_value + 1
+        # Since 0 will be the first element and the subsequent elements are all move up (e.g. note 23 is not on the 23rd
+        # position, but on the second
+        # and thus isnt the exact position we have to manually change that
+        positions[positions<0] = 0
+
+        matrix[np.arange(0, data.size), positions]=1
         return matrix
     else:
         raise ValueError("Data dimension should be 1, not implemented yet for 2, but you can just manually loop.")
@@ -69,13 +74,4 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
 
 
 if __name__ == "__main__":
-    # Split_rolling_window([[0,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1],[0,1,0,0],[0,0,1,0]],window_size = 2)
-
-
-    voice1 = np.loadtxt("F.txt").T[0]
-    vector = Transform_into_vector(voice1)
-    X_train, X_test, y_train, y_test = Split_rolling_window(voice1, vector, window_size=100)
-    reg = LinearRegression().fit(X_train, y_train)
-    score = reg.score(X_test, y_test)
-
-    print(score)
+    print(Transform_into_vector(np.array([0,25,27,27,27,26])))

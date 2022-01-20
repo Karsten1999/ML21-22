@@ -4,25 +4,32 @@ import Convert_to_MIDI
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-voice1 = np.loadtxt("F.txt").T[0][1500::]
+voice1 = np.loadtxt("F.txt").T[0][3408::]
 predicted_voice = []
 vector = Preprocessing.Transform_into_vector(voice1)
+print(len(vector[0]))
 
 min_note = min(voice1)
 
 # Parameter to set length of prediction
-prediction_length = 256
+prediction_length = 128
 # Parameter to set windows size
-window_size = 70
+window_size = 32
 
 X, y = Preprocessing.Split_rolling_window(voice1, vector, window_size=window_size, train=False)
 reg = LinearRegression().fit(X, y)
+
+#X_predict = [voice1[len(voice1)-window_size::]]
+#test = Postprocessing.prediction_vector_traverse(X_predict, reg, min_note, prediction_length=prediction_length
+#                                                 , limit_chance=0.2)
+
+#print(test)
 
 for i in range(prediction_length):
     length = len(voice1)
     X = [voice1[length-window_size::]]
     y_pred = reg.predict(X)
-    y_pred = Postprocessing.prediction_vector_pick_highest(y_pred, zero_bias=0.02)[0]
+    y_pred = Postprocessing.prediction_vector_pick_stochastically(y_pred, min_chance=0.1)[0]
 
 
     vector = np.append(vector, y_pred)
