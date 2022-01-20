@@ -18,11 +18,11 @@ def get_note_duration_time(data):
             duration += 1/4
             # Check if the note is the final note
             if i + 1 == len(data):
-                note_duration_time_pair.append([int(current_note) + 20, duration, current_time])
+                note_duration_time_pair.append([int(current_note) + 8, duration, current_time])
         else:
             # appending the last note, since now the code will move on
-            # 20 is added since a MIDI note is 20 higher than the note number
-            note_duration_time_pair.append([int(current_note)+20, duration, current_time])
+            # 20 is added since a MIDI note is0 8 higher than the note number
+            note_duration_time_pair.append([int(current_note)+8, duration, current_time])
             duration = 1/4
             # Updating note
             current_note = note
@@ -66,16 +66,16 @@ def convert_to_midi(filename: str, outputname: str = "output.mid"):
         track = 0
         MyMIDI = MIDIFile(1)
         for note, duration, time in note_duration_time_pair:
-            # Only actually add notes that are non-zero (or non-20 since we added 20)
-            if note>20:
+            # Only actually add notes that are non-zero (or non-8 since we added 8)
+            if note>8:
                 MyMIDI.addNote(track, channel, note, time, duration, volume)
     elif voices > 1:
         MyMIDI = MIDIFile(voices)
         tracks = range(0, voices)
         for track in tracks:
             for note, duration, time in note_duration_time_pair[track]:
-                # Only actually add notes that are non-zero (or non-20 since we added 20)
-                if note > 20:
+                # Only actually add notes that are non-zero (or non-8 since we added 8)
+                if note > 8:
                     MyMIDI.addNote(track, channel, int(note), time, duration, volume)
     if MyMIDI:
         with open(outputname, "wb") as out:
