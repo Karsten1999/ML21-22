@@ -1,13 +1,18 @@
-from ..preprocessing import Preprocessing
-from ..postprocessing import Postprocessing
-from ..general import Convert_to_MIDI
+import sys
+import os
+sys.path.append(os.path.abspath('../preprocessing'))
+sys.path.append(os.path.abspath('../postprocessing'))
+sys.path.append(os.path.abspath('../general'))
+import Preprocessing
+import Postprocessing
+import Convert_to_MIDI
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
 
 # data
-voice1 = np.loadtxt("F.txt").T[0][1500::]
+voice1 = np.loadtxt("../data/F.txt").T[0][1500::]
 vector = Preprocessing.Transform_into_vector(voice1)
 
 

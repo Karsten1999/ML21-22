@@ -1,5 +1,9 @@
-from ..preprocessing import Preprocessing
-from ..postprocessing import Postprocessing
+import sys
+import os
+sys.path.append(os.path.abspath('../preprocessing'))
+sys.path.append(os.path.abspath('../postprocessing'))
+import Preprocessing
+import Postprocessing
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from matplotlib import pyplot as plt
