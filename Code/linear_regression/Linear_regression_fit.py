@@ -1,30 +1,37 @@
-import Preprocessing
-import Postprocessing
+from ..preprocessing import Preprocessing
+from ..postprocessing import Postprocessing
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.metrics import r2_score, accuracy_score, f1_score, adjusted_mutual_info_score
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
 
-voice1 = np.loadtxt("F.txt").T[0]
+voice1 = np.loadtxt("../data/F.txt").T[0]
 vector = Preprocessing.Transform_into_vector(voice1)
 score = []
 difference = []
 
-window = range(1,128,1)
+window = range(8,256,8)
 tot = len(window)
 k = 0
 
+scaler = StandardScaler()
+
 for i in window:
-    temp_score = []
-    for j in range(4):
+    tempscore = []
+    for p in range(50):
         X_train, X_test, y_train, y_test = Preprocessing.Split_rolling_window(voice1, vector, window_size=i)
+        scaler.fit(X_train)
+
+        X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
+
         reg = LinearRegression().fit(X_train, y_train)
 
         y_pred = reg.predict(X_test)
-        y_pred = Postprocessing.prediction_vector_pick_highest(y_pred)
+        y_pred = Postprocessing.prediction_vector_pick_highest(y_pred, zero_bias=0.1)
 
-        temp_score.append(r2_score(y_test, y_pred))
-    score.append(np.mean(temp_score))
+        tempscore.append(accuracy_score(y_test, y_pred))
+    score.append(np.mean(tempscore))
     k += 1
     print("Done:", k / tot)
 

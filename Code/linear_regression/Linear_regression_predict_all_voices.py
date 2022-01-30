@@ -1,5 +1,5 @@
-import Preprocessing
-import Postprocessing
+from ..preprocessing import Preprocessing
+from ..postprocessing import Postprocessing
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from matplotlib import pyplot as plt

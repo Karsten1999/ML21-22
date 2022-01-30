@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
 
 
 def Transform_into_vector(data: np.array, min_value: int = None, max_value: int = None):
@@ -71,6 +70,18 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
     return X_train, X_test, y_train, y_test
+
+
+def transform_into_difference(data: np.array):
+    """"
+    Function to transform the data to a form that compares the difference with the previous note
+
+    :param data: the data in terms of key note values
+
+    :returns: data in terms of difference with the previous note
+    """
+
+    return data[1::] - data[0:-1]
 
 
 if __name__ == "__main__":

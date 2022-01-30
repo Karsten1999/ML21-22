@@ -1,7 +1,5 @@
 import numpy as np
 
-voice1 = np.loadtxt("F.txt").T[0]
-
 def read_length(voice):
 	"""
 	:param data: the input voice
@@ -57,5 +55,3 @@ def find_pitches(voice):
 			note = pitch(voice[i] + 8, minnote, maxnote) # +8 is correction to MIDI
 		notelist = np.append(notelist, note, axis = 1)
 	return notelist
-
-print(find_pitches(voice1))

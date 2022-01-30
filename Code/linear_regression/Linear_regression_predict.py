@@ -1,35 +1,38 @@
-import Preprocessing
-import Postprocessing
-import Convert_to_MIDI
+from ..preprocessing import Preprocessing
+from ..postprocessing import Postprocessing
+from ..general import Convert_to_MIDI
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
 
-voice1 = np.loadtxt("F.txt").T[0][3408::]
-predicted_voice = []
+
+# data
+voice1 = np.loadtxt("F.txt").T[0][1500::]
 vector = Preprocessing.Transform_into_vector(voice1)
-print(len(vector[0]))
 
-min_note = min(voice1)
+
+# minimum note used for converting probability vector back into note
+min_note = min(voice1[voice1>0])
+
+predicted_voice = []
 
 # Parameter to set length of prediction
-prediction_length = 128
+prediction_length = 256
 # Parameter to set windows size
-window_size = 32
+window_size = 250
 
 X, y = Preprocessing.Split_rolling_window(voice1, vector, window_size=window_size, train=False)
-reg = LinearRegression().fit(X, y)
 
-#X_predict = [voice1[len(voice1)-window_size::]]
-#test = Postprocessing.prediction_vector_traverse(X_predict, reg, min_note, prediction_length=prediction_length
-#                                                 , limit_chance=0.2)
+scaler = StandardScaler()
+scaler.fit(X)
+reg = LinearRegression().fit(scaler.transform(X), y)
 
-#print(test)
 
 for i in range(prediction_length):
     length = len(voice1)
     X = [voice1[length-window_size::]]
-    y_pred = reg.predict(X)
-    y_pred = Postprocessing.prediction_vector_pick_stochastically(y_pred, min_chance=0.1)[0]
+    y_pred = reg.predict(scaler.transform(X))
+    y_pred = Postprocessing.prediction_vector_pick_highest(y_pred, zero_bias=0.1)[0]
 
 
     vector = np.append(vector, y_pred)
