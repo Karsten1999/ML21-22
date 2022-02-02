@@ -34,10 +34,10 @@ def pitch(note, minnote, maxnote):
 	radius_fifths = 1
 	maxpitch = 2 * np.log2(2 ** ((maxnote - 69) / 12) * 440)  # A4 = 440 Hz and note 69
 	minpitch = 2 * np.log2(2 ** ((minnote - 69) / 12) * 440)
-	chroma_x = radius_chroma * np.sin(chroma[note_name] * np.pi / 6)
-	chroma_y = radius_chroma * np.cos(chroma[note_name] * np.pi / 6)
-	fifths_x = radius_fifths * np.sin(fifths[note_name] * np.pi / 6)
-	fifths_y = radius_fifths * np.cos(fifths[note_name] * np.pi / 6)
+	chroma_x = radius_chroma * np.cos(chroma[note_name] * np.pi / 6)
+	chroma_y = radius_chroma * np.sin(chroma[note_name] * np.pi / 6)
+	fifths_x = radius_fifths * np.cos(fifths[note_name] * np.pi / 6)
+	fifths_y = radius_fifths * np.sin(fifths[note_name] * np.pi / 6)
 	freq = 2 ** ((note - 69) / 12) * 440 
 	pitch = 2 * np.log2(freq) - maxpitch + (maxpitch - minpitch) / 2
 	return np.array([[pitch, chroma_x, chroma_y, fifths_x, fifths_y]]).T
@@ -52,6 +52,31 @@ def find_pitches(voice):
 		if voice[i] == 0:
 			note = np.zeros((5,1))
 		else:
-			note = pitch(voice[i] + 8, minnote, maxnote) # +8 is correction to MIDI
+			note = pitch(voice[i] + 8, minnote + 8, maxnote + 8) # +8 is correction to MIDI
 		notelist = np.append(notelist, note, axis = 1)
 	return notelist
+
+def inverse_pitch(pitches, maxpitch, minpitch):
+	"""Reverts pitch transformation into a midi note."""
+	pitch = pitches[0,:]
+	note_name = np.zeros(len(pitch))
+	n = 69 + 12 * np.log2(1/440) + 3 * maxpitch + 3 * minpitch + 6 * pitch # inverse of pitch function
+	for i in range(len(n)):
+		if sum(np.abs(pitches[:,i]))>1e-10: # avoid floating point errors
+			note_name[i] = n[i]
+	return note_name
+
+
+
+def find_lim_pitches(voice):
+	"""Finds max and min pitches for a given voice."""
+	maxnote = max(voice)
+	minnote = min(voice[voice > 0])
+	maxpitch = 2 * np.log2(2 ** ((maxnote - 69) / 12) * 440)  # A4 = 440 Hz and note 69
+	minpitch = 2 * np.log2(2 ** ((minnote - 69) / 12) * 440)
+	return maxpitch, minpitch
+
+voice1 = np.loadtxt("../data/F.txt").T[2]
+x = find_pitches(voice1)
+maxp, minp = find_lim_pitches(voice1)
+v = inverse_pitch(x, maxp, minp)
