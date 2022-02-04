@@ -4,56 +4,88 @@ import os
 sys.path.append(os.path.abspath('../preprocessing'))
 import Note_representation
 import numpy as np
+import matplotlib.pyplot as plt
+
+
+def parametersearch(train, test, end_n = 18):
+    """"
+    Find best parameters for the model and returning the scores for the parameters
+    """
+    # Data for storing the best parameters in the order model, n_components, covariance_type
+    bestscore = 0
+    bestparam = {}
+
+    # Data for plotting
+    allscores = []
+
+    all_n = range(1, end_n)
+    for cov in ['spherical', 'diag']:
+        for n in all_n:
+            # Training the model
+            model = hmm.GaussianHMM(n_components=n,covariance_type=cov)
+            model.fit(train)
+
+            # Scoring the model
+            score = model.score(test)
+            allscores.append(score)
+            if score > bestscore:
+                bestscore = score
+                bestparam = {'model': hmm.GaussianHMM, 'n_components': n, 'covariance_type': cov, 'score': score}
+    return bestparam, allscores
+
+
+def plot_score(scores, end_n):
+    """"
+    Function to plot the bar charts for the scores
+    """
+    # Extracting the corresponding scores
+    sphscore = scores[0:end_n - 1]
+    diagscore = scores[end_n - 1::]
+
+    all_n = range(1, end_n)
+
+    fig, ax = plt.subplots()
+
+    # Setting up the bars
+    width = 0.4
+    x = np.arange(len(all_n))
+
+    ax.bar(x - 1 / 2 * width, sphscore, width, label='Spherical')
+    ax.bar(x + 1 / 2 * width, diagscore, width, label='Diagonal')
+
+    # Generic graph stuff
+    ax.set_ylabel('Scores')
+    ax.set_xlabel('Number of states')
+    ax.set_title('Log-likelihood of GHMM for different hyperparameters: 1 voice')
+    ax.set_xticks(x)
+    ax.set_xticklabels(x + 1)
+    ax.grid()
+    ax.legend()
+
+    fig.tight_layout()
+    fig.savefig("Hyperparameter_search_GHMM_1voice.pdf")
+
+    plt.show()
+
 
 # Loading and transforming the data
-voice1 = np.loadtxt("../data/F.txt").T[0][2000::]
+voice1 = np.loadtxt("../data/F.txt").T[0][3095::]
 voice1 = Note_representation.find_pitches(voice1).T
 
 
 split = int(len(voice1)*0.8)
 traindata, testdata = voice1[0:split], voice1[split::]
 
-# Data for storing the best parameters in the order model, n_components, covariance_type
-bestscore = 0
-
 # Finding best paramaters for HMM
-for cov in ['spherical', 'diag', 'full', 'tied']:
-    for n in range(1,21):
-        # Training the model
-        model = hmm.GaussianHMM(n_components=n, n_iter=10000, covariance_type=cov)
-        model.fit(traindata)
-
-        # Scoring the model
-        score = model.score(testdata)
-        if score > bestscore:
-            bestscore = score
-            bestparam = {'model': hmm.GaussianHMM, 'n_components': n, 'covariance_type': cov, 'score': score}
+bestparam, allscores = parametersearch(traindata, testdata)
 print(bestparam)
-""""
-# Finding best paramaters for GMMHMM
-for cov in ['spherical', 'diag', 'full', 'tied']:
-    for n_mix in range(3,10):
-        for n in range(n_mix,21):
-            # Training the model
-            model = hmm.GMMHMM(n_components=n, n_iter=10000, covariance_type=cov, n_mix=n_mix)
-            model.fit(traindata)
 
-            # Scoring the model
-            score = model.score(testdata)
-            print(n_mix, n, score)
-            if score > bestscore:
-                bestscore = score
-                bestparam = {'model': hmm.GaussianHMM, 'n_components': n, 'covariance_type': cov, 'n_mix': n_mix,
-                             'score': score}
-"""
+allscores = np.array(allscores)
+
+allscores[allscores<-5000]=-5000
+
+plot_score(allscores, 18)
 
 
-#print(model.sample(100))
-
-#state_sequence = model.predict(voice1)
-#prob_next_step = model.transmat_[state_sequence[-1], :]
-
-#print(state_sequence[-1])
-#print(prob_next_step)
 
 
