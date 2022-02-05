@@ -59,7 +59,7 @@ def output_midi(res, voice, filename):
 # reading data and creating MIDI files
 voice = np.loadtxt("../data/F.txt").T
 for i in range(len(voice)):
-	fit4 = hmm_fit(voice[i], 100, 4)
-	fit7 = hmm_fit(voice[i], 100, 7)
+	fit4 = hmm_fit(voice[i], 40, 4)
+	fit7 = hmm_fit(voice[i], 40, 7)
 	output_midi(fit4, voice[i], "4comps{:}".format(i))
 	output_midi(fit7, voice[i], "7comps{:}".format(i))
