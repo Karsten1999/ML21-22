@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 # data
-voice1 = np.loadtxt("../data/F.txt").T[0][1500::]
+voice1 = np.loadtxt("../data/F.txt").T[0][3095::]
 vector = Preprocessing.Transform_into_vector(voice1)
 
 
@@ -24,7 +24,7 @@ predicted_voice = []
 # Parameter to set length of prediction
 prediction_length = 256
 # Parameter to set windows size
-window_size = 250
+window_size = 650 # 500,600, 650, 680 was good, 650 best probably
 
 X, y = Preprocessing.Split_rolling_window(voice1, vector, window_size=window_size, train=False)
 

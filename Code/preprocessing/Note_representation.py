@@ -44,7 +44,7 @@ def pitch(note, minnote, maxnote):
 
 def find_pitches(voice):
 	"""Finds pitches for all notes in a voice"""
-	notelist = np.empty((5, 1))
+	notelist = np.zeros((5, 1))
 
 	minnote = min(voice[voice > 0])
 	maxnote = max(voice)

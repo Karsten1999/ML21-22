@@ -43,7 +43,7 @@ def Transform_into_vector(data: np.array, min_value: int = None, max_value: int 
         raise ValueError("Data dimension should be 1, not implemented yet for 2, but you can just manually loop.")
 
 
-def Split_rolling_window(data, vector, test_size: float = None, window_size: int = 16, train = True):
+def Split_rolling_window(data, vector, test_size: float = None, window_size: int = 16, train = True, output_size = 1):
     """
     Function to split the data into a training and test set
 
@@ -51,6 +51,7 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
     :param vector: the data in terms of a vector, used to make y
     :param window_size: size of the training windows
     :param train: whether to make a test and training set or just return the complete X and y
+    :param output_size: size of the y-vectors
     :return:
     """
 
@@ -58,10 +59,14 @@ def Split_rolling_window(data, vector, test_size: float = None, window_size: int
     y = []
 
     # Creating X and Y by using a rolling window
-    for i in range(0, len(vector) - window_size):
-        X.append(data[i:i+window_size])
-        y.append(vector[i+window_size])
-
+    if output_size==1:
+        for i in range(0, len(vector) - window_size):
+            X.append(data[i:i+window_size])
+            y.append(vector[i+window_size])
+    else:
+        for i in range(0, len(vector) - window_size - output_size):
+            X.append(data[i:i + window_size])
+            y.append(vector[i + window_size: i + window_size + output_size].flatten())
     X = np.array(X)
     y = np.array(y)
     if not train:
