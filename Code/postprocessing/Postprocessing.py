@@ -60,13 +60,19 @@ def prediction_vector_pick_highest(y_pred, zero_bias: float = 1):
 
     :returns score of the prediction
     """
-    y_prediction = []
-    for yp in y_pred:
-        yp[0] = yp[0] * zero_bias
-        yp[yp < max(yp)] = 0
-        yp[yp == max(yp)] = 1
-        y_prediction.append(yp)
-    return y_prediction
+    if y_pred.ndim == 1:
+        y_pred[0] = y_pred[0] * zero_bias
+        y_pred[y_pred < max(y_pred)] = 0
+        y_pred[y_pred == max(y_pred)] = 1
+        return y_pred
+    if y_pred.ndim == 2:
+        y_prediction = []
+        for yp in y_pred:
+            yp[0] = yp[0] * zero_bias
+            yp[yp < max(yp)] = 0
+            yp[yp == max(yp)] = 1
+            y_prediction.append(yp)
+        return y_prediction
 
 
 def prediction_vector_pick_stochastically(y_pred, zero_bias: float = 1, min_chance: float = None):
