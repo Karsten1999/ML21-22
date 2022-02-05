@@ -12,7 +12,7 @@ def parametersearch(train, test, end_n = 18):
     Find best parameters for the model and returning the scores for the parameters
     """
     # Data for storing the best parameters in the order model, n_components, covariance_type
-    bestscore = 0
+    bestscore = -5000
     bestparam = {}
 
     # Data for plotting
@@ -67,11 +67,25 @@ def plot_score(scores, end_n):
 
     plt.show()
 
+voices = np.loadtxt("../data/F.txt").T[:,3095::]
 
+split = int(len(voices[0])*0.8)
+traindata, testdata = voices[:,0:split], voices[:,split::]
+
+bestparam, allscores = parametersearch(traindata.T, testdata.T)
+print(bestparam)
+
+allscores = np.array(allscores)
+
+allscores[allscores<-5000]=-5000
+
+plot_score(allscores, 18)
+
+""""
 # Loading and transforming the data
 voice1 = np.loadtxt("../data/F.txt").T[0][3095::]
 voice1 = Note_representation.find_pitches(voice1).T
-
+print(len(voice1))
 
 split = int(len(voice1)*0.8)
 traindata, testdata = voice1[0:split], voice1[split::]
@@ -85,6 +99,8 @@ allscores = np.array(allscores)
 allscores[allscores<-5000]=-5000
 
 plot_score(allscores, 18)
+"""
+
 
 
 
