@@ -2,32 +2,35 @@ import sys
 import os
 sys.path.append(os.path.abspath('../preprocessing'))
 sys.path.append(os.path.abspath('../general'))
+
 import numpy as np
 from hmmlearn import hmm # Hidden Markov Model package
-import Note_representation
 from sklearn import preprocessing as pre
+
 import Convert_to_MIDI
-import matplotlib.pyplot as plt
-#from Preprocessing import Transform_into_vector
+import Note_representation
 
 # Contrapunctus XIV is split in 3 parts, 
-# this is what I identify as the start of the third part
+# this index is what I identify as the start of the third part
 # upon listening to the piece. Subtracted 1 since arrays start at 0.
 first_note_of_3rd_section = 3095
 
-voice1 = np.loadtxt("../data/F.txt").T[0]
+
 
 
 def hmm_fit(voice, nSamp, components):
-	# ugly transformations
+	"""Return nSamp fitted note-length pairs using a HMM with n_components = components."""
+	# LabelEncoder transformations
 	le = pre.LabelEncoder()
 	le.fit(voice)
 	newvoice=le.transform(voice)
-	lengths, notes = Note_representation.read_length(newvoice.reshape(-1, 1))
+
 	#encoding of lengths and note values into 1 int
+	lengths, notes = Note_representation.read_length(newvoice.reshape(-1, 1))
 	a = max(notes)
 	notevec = (a * lengths + notes)
 
+	# another LabelEncoder transformation
 	le2 = pre.LabelEncoder()
 	le2.fit(notevec)
 	transnotes = le2.transform(notevec).reshape(-1, 1)
@@ -44,15 +47,19 @@ def hmm_fit(voice, nSamp, components):
 	results = np.append(fnotes[:, np.newaxis], flengths[:, np.newaxis], axis=1)
 	return results
 
-def output_midi(results, filename):
-	fitvoice=voice1
-	for i in range(len(results)):
-		for j in range(int(results[i,1])):
-			fitvoice=np.append(fitvoice,results[i,0])
-	np.savetxt(filename+".txt", fitvoice, fmt='%i')
-	Convert_to_MIDI.convert_to_midi(filename+".txt", filename+".mid")
+def output_midi(res, voice, filename):
+	"""Transform an original voice and outputs into a MIDI file."""
+	f = voice
+	for i in range(len(res)):
+		for j in range(int(res[i, 1])):
+			f = np.append(f, res[i, 0])
+	np.savetxt(filename + ".txt", f, fmt = '%i')
+	Convert_to_MIDI.convert_to_midi(filename + ".txt", filename + ".mid")
 
-fit4 = hmm_fit(voice1, 100, 4)
-fit7 = hmm_fit(voice1, 100, 7)
-output_midi(fit4, "4comps")
-output_midi(fit7, "7comps")
+# reading data and creating MIDI files
+voice = np.loadtxt("../data/F.txt").T
+for i in range(len(voice)):
+	fit4 = hmm_fit(voice[i], 100, 4)
+	fit7 = hmm_fit(voice[i], 100, 7)
+	output_midi(fit4, voice[i], "4comps{:}".format(i))
+	output_midi(fit7, voice[i], "7comps{:}".format(i))
